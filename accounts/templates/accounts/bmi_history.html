@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BMI History</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container mt-4">
+    <h1>BMI History</h1>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>BMI</th>
+                <th>Predicted BMI</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in bmi_history %}
+            <tr>
+                <td>{{ record.recorded_at|date:"d M Y" }}</td>
+                <td>{{ record.bmi_value }}</td>
+                <td>{{ record.predicted_bmi|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <canvas id="bmiChart" width="400" height="200"></canvas>
+    <script>
+        var ctx = document.getElementById('bmiChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [{% for record in bmi_history %}'{{ record.recorded_at|date:"d M Y" }}',{% endfor %}],
+                datasets: [{
+                    label: 'BMI Over Time',
+                    data: [{% for record in bmi_history %}{{ record.bmi_value }},{% endfor %}],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

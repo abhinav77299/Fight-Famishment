@@ -37,3 +37,9 @@ class Profile(models.Model):
     gender = models.CharField(max_length=15, choices=[('Male', 'Male'), ('Female', 'Female')])
     def _str_(self):
         return self.user.username
+
+class BMIHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bmi_value = models.FloatField()
+    predicted_bmi = models.FloatField()
+    recorded_at = models.DateTimeField(auto_now_add=True)

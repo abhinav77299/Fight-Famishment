@@ -4,7 +4,7 @@ from django.http import QueryDict
 import json
 from urllib.parse import unquote
 import urllib
-from .models import recipe,gen_ins,FoodItem
+from .models import recipe,gen_ins,FoodItem,BMIHistory
 import pandas as pd
 import joblib
 from .ml_models import train_model
@@ -132,7 +132,7 @@ def usermain(request):
             category = "Unknown gender"
 
         # BMR Calculation
-        age_category = map_age_to_category(age)  # Assuming you have a function that maps age to a category
+        age_category = map_age_to_category(age)
 
         if age_category != "N/A":
             age_division = age_category.split('-')
@@ -140,7 +140,7 @@ def usermain(request):
             age_max = float(age_division[1])
             bmr_age = (age_min + age_max) / 2
         else:
-            bmr_age = 0  # Handle the N/A case accordingly
+            bmr_age = 0
 
         if gender.lower() == "male":
             bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * bmr_age)
@@ -160,7 +160,7 @@ def usermain(request):
         }
 
         # Get activity factor
-        activity_factor = activity_factors.get(activity_level, 1.2)  # Default to sedentary if not found
+        activity_factor = activity_factors.get(activity_level, 1.2)
 
         # Calculate TDEE
         if isinstance(bmr, (int, float)):
@@ -175,11 +175,15 @@ def usermain(request):
                     calorie_message = "You are underweight and consuming insufficient calories. You should increase your calorie intake to promote healthy weight gain."
                 elif total_calories > tdee:
                     calorie_message = "You are underweight, but you are consuming more calories. Continue with this calorie intake to achieve a healthier weight."
+                else:
+                    calorie_message = "Your calorie intake is balanced."
             elif category == "Overweight":
                 if total_calories < tdee:
-                    calorie_message = "You are overweight, and you are consuming fewer calories. Continue with this calorie deficit to promote weight loss, but make sure it’s gradual and healthy."
+                    calorie_message = "You are overweight, and you are consuming fewer calories. Continue with this calorie deficit to promote weight loss, but make sure it's gradual and healthy."
                 elif total_calories > tdee:
                     calorie_message = "You are overweight and consuming excessive calories. Reduce your calorie intake and exercise more to promote weight loss."
+                else:
+                    calorie_message = "Your calorie intake is balanced."
             else:  # For Healthy BMI
                 if total_calories < tdee:
                     calorie_message = "You are healthy but consuming fewer calories than required. You should increase your intake to maintain your weight."
@@ -191,17 +195,13 @@ def usermain(request):
             calorie_message = "Unable to calculate calorie balance due to missing data."
 
         # Get current date and determine season
-        #current_date = datetime(2024, 9, 15).date()  # Replace with actual date logic
         current_date = datetime.now().date()
-        # Call a function to get the season
         season, mal_instructions = get_season(current_date)
 
         # Querying database for relevant data
         object_1 = recipe.objects.filter(district=district, category=category, age=age_category)
         object_2 = gen_ins.objects.filter(age=age_category)
 
-        # Render the template with updated context
-        
         for obj in object_2:
             return render(request, 'accounts/usermain.html', {
                 'obj1': object_1,
@@ -212,12 +212,11 @@ def usermain(request):
                 'season': season,
                 'calorie_message': calorie_message,
                 'bmr': bmr,
-                'tdee': tdee,  # Include the message in the context
-                  # Send updated profile to the template
+                'tdee': tdee,
             })
 
-    # Handle GET request or other logic
     return render(request, 'accounts/usermain.html')
+
 def items_home(request):
     my_data = request.GET.get('data', '')
     object_1=recipe.objects.filter(recipe_name=my_data)
@@ -245,8 +244,10 @@ def yoga3(request):
     return render(request,'accounts/yoga3.html')
 def yoga4(request):
     return render(request,'accounts/yoga4.html')
+
 def bmi(request):
     return render(request,'accounts/bmi.html')
+
 def bmi_predicted(request):
     if request.method == 'POST':
         # Retrieve form data
@@ -261,7 +262,8 @@ def bmi_predicted(request):
         fruits_quantity = int(request.POST['fruits'])
         buttermilk_quantity = int(request.POST['buttermilk'])
         juice_quantity = int(request.POST['juice'])
-        workout=int(request.POST['workout'])
+        workout = int(request.POST['workout'])
+
         # Calculate total nutrients and calories
         total_proteins = rice_quantity * 2.6 + roti_quantity * 3 + dal_quantity * 8.9 + eggs_quantity * 6 + sabzi_quantity * 2 + fruits_quantity * 0.6 + buttermilk_quantity * 2 + juice_quantity * 0.5
         total_fats = rice_quantity * 0.3 + roti_quantity * 1 + dal_quantity * 0.4 + eggs_quantity * 5.3 + sabzi_quantity * 4 + fruits_quantity * 0.5 + buttermilk_quantity * 1.5 + juice_quantity * 0.2
@@ -274,7 +276,7 @@ def bmi_predicted(request):
         bmi = int(weight / ((height / 100) ** 2))
         protein_percentage = (total_proteins / 1000) * 100
         carbohydrate_percentage = (total_carbohydrates / 5000) * 100
-        fat_percentage = (total_fats / 2000) * 100 
+        fat_percentage = (total_fats / 2000) * 100
 
         total_nutrients = total_proteins + total_fats + total_carbohydrates + total_vitamins + total_minerals
         protein_percentage2 = (total_proteins / total_nutrients) * 100
@@ -282,27 +284,28 @@ def bmi_predicted(request):
         fat_percentage2 = (total_fats / total_nutrients) * 100
         vitamin_percentage2 = (total_vitamins / total_nutrients) * 100
         mineral_percentage2 = (total_minerals / total_nutrients) * 100
-        # Render results in a new HTML page
 
-
-        
-
-        # Load your dataset containing BMI values
-        # For example, if you have a CSV file with BMI values, you can load it using pandas
+        # Load dataset
         dataset = pd.read_csv('accounts/dataset_2nd_april.csv')
-
-        # Extract the corresponding BMI values from the dataset
-        X = dataset.drop('BMI After 30 Days' , axis=1)
+        X = dataset.drop('BMI After 30 Days', axis=1)
         y = dataset['BMI After 30 Days']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        # Train the model
-        model = train_model(X_train, y_train)
 
-        # Save the trained model
+        # Train and save model
+        model = train_model(X_train, y_train)
         joblib.dump(model, 'accounts/linear_regression_model.pkl')
 
         # Make predictions
-        predicted_bmi = model.predict([[bmi,total_calories,workout]])
+        predicted_bmi = model.predict([[bmi, total_calories, workout]])
+
+        # Save BMI history record if user is authenticated
+        if request.user.is_authenticated:
+            BMIHistory.objects.create(
+                user=request.user,
+                bmi_value=bmi,
+                predicted_bmi=predicted_bmi[0]
+            )
+
         return render(request, 'accounts/bmi_predicted.html', {
             'bmi': bmi,
             'total_proteins': total_proteins,
@@ -319,9 +322,16 @@ def bmi_predicted(request):
             'fat_percentage2': fat_percentage2,
             'vitamin_percentage2': vitamin_percentage2,
             'mineral_percentage2': mineral_percentage2,
-            'workout':workout,
+            'workout': workout,
             'predicted_bmi': predicted_bmi[0],
         })
+
+
+def bmi_history(request):
+    bmi_records = BMIHistory.objects.filter(
+        user=request.user).order_by('-recorded_at')[:10]
+    return render(request, 'accounts/bmi_history.html', {'bmi_history': bmi_records})
+
 
 def get_season(date):
     month = date.month
@@ -339,15 +349,13 @@ def get_season(date):
         return "Post-Monsoon/Autumn", mal_instructions
     return "Unknown Season", ""
 
+
 def map_age_to_category(age):
     try:
-        # Remove non-numeric characters and convert to integer
         age = ''.join(filter(str.isdigit, age))
-        if not age:  # Check if age is empty after filtering
+        if not age:
             return "N/A"
-        
-        age = int(age)  # Convert input to an integer
-        
+        age = int(age)
         if 0 <= age < 1:
             return "0-1"
         elif 1 <= age < 2:
@@ -365,34 +373,29 @@ def map_age_to_category(age):
         elif 36 <= age <= 45:
             return "36-45"
         else:
-            return "N/A"  # Out of defined ranges
+            return "N/A"
     except ValueError:
-        return "N/A"  # Handle non-integer input
+        return "N/A"
+
+
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            # Save the user and associated profile
             user = form.save()
-            print("User registered successfully!")  # Debugging
-            print(f"Username: {user.username}, Email: {user.email}")  # Debugging
-
-            # Log the user in after successful registration
+            print("User registered successfully!")
+            print(f"Username: {user.username}, Email: {user.email}")
             login(request, user)
-
-            # Redirect to a home page or dashboard (adjust as needed)
             return redirect('login')
         else:
-            print("Form errors:", form.errors)  # Debugging
-
+            print("Form errors:", form.errors)
     else:
         form = RegisterForm()
-
     return render(request, 'accounts/register.html', {'form': form})
 
-# Login view
+
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
 
     def get_success_url(self):
-        return reverse('home')  # Redirect to home page after successful login
+        return reverse('home')
