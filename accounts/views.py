@@ -38,7 +38,6 @@ def child_bmi(request):
     bmi = None
 
     if request.user.is_authenticated:
-        # Get the logged-in user's profile
         profile = Profile.objects.filter(user=request.user).first()
 
         if not profile:
@@ -46,47 +45,39 @@ def child_bmi(request):
 
         print("Profile before update:", profile.height, profile.weight)
 
-        # Handle form submission for logged-in user
         if request.method == "POST":
             height = request.POST.get("height")
             weight = request.POST.get("weight")
             state = request.POST.get("district")
             gender = request.POST.get("gender")
 
-            # Update profile fields only if valid data is provided
             if height:
                 profile.height = float(height)
-                print("Submitted height:", height)
             if weight:
                 profile.weight = float(weight)
-                print("Submitted weight:", weight)
             if state:
                 profile.state = state
             if gender:
                 profile.gender = "M" if gender.lower() == "male" else "F"
 
-            # Save the updated profile
             profile.save()
-
-            # Redirect to refresh the page with updated data
             return redirect("child_bmi")
 
-        # Calculate BMI for logged-in user
         if profile.height and profile.weight:
-            height_in_m = profile.height / 100  # Convert height to meters
+            height_in_m = profile.height / 100
             bmi = round(profile.weight / (height_in_m ** 2), 2)
 
-    # Handle unauthenticated users
     return render(request, "accounts/child_bmi.html", {
         "profile": profile,
         "bmi": bmi,
         "message": "Please log in to view your profile details." if not profile else ""
     })
+
 def blog(request):
     return render(request,'accounts/blog.html')
+
 def usermain(request):
     if request.method == 'POST':
-        # Get data from POST request
         height = float(request.POST['height'])
         weight = float(request.POST['weight'])
         age = request.POST['age']
@@ -96,24 +87,17 @@ def usermain(request):
         activity_level = request.POST['activity_level']
         category = ""
 
-        # Update the profile with new details
         if request.user.is_authenticated:
             profile = Profile.objects.filter(user=request.user).first()
-
             if profile:
-                # Update the profile fields with the new data from the form
                 profile.height = height
                 profile.weight = weight
                 profile.state = district
                 profile.gender = "Male" if gender.lower() == "male" else "Female"
-
-                # Save the updated profile
                 profile.save()
 
-        # BMI Calculation
         bmi = weight / ((height / 100) ** 2)
 
-        # Gender-specific BMI category determination
         if gender.lower() == "male":
             if bmi < 18.5:
                 category = "Underweight"
@@ -131,7 +115,6 @@ def usermain(request):
         else:
             category = "Unknown gender"
 
-        # BMR Calculation
         age_category = map_age_to_category(age)
 
         if age_category != "N/A":
@@ -149,7 +132,6 @@ def usermain(request):
         else:
             bmr = "N/A"
 
-        # Activity factors
         activity_factors = {
             "Sedentary": 1.2,
             "Light": 1.375,
@@ -159,16 +141,13 @@ def usermain(request):
             "Extra Active": 2.0
         }
 
-        # Get activity factor
         activity_factor = activity_factors.get(activity_level, 1.2)
 
-        # Calculate TDEE
         if isinstance(bmr, (int, float)):
             tdee = bmr * activity_factor
         else:
             tdee = "N/A"
 
-        # Determine message based on BMI category and calorie consumption
         if isinstance(tdee, (int, float)):
             if category == "Underweight":
                 if total_calories < tdee:
@@ -184,7 +163,7 @@ def usermain(request):
                     calorie_message = "You are overweight and consuming excessive calories. Reduce your calorie intake and exercise more to promote weight loss."
                 else:
                     calorie_message = "Your calorie intake is balanced."
-            else:  # For Healthy BMI
+            else:
                 if total_calories < tdee:
                     calorie_message = "You are healthy but consuming fewer calories than required. You should increase your intake to maintain your weight."
                 elif total_calories > tdee:
@@ -194,11 +173,9 @@ def usermain(request):
         else:
             calorie_message = "Unable to calculate calorie balance due to missing data."
 
-        # Get current date and determine season
         current_date = datetime.now().date()
         season, mal_instructions = get_season(current_date)
 
-        # Querying database for relevant data
         object_1 = recipe.objects.filter(district=district, category=category, age=age_category)
         object_2 = gen_ins.objects.filter(age=age_category)
 
@@ -250,7 +227,6 @@ def bmi(request):
 
 def bmi_predicted(request):
     if request.method == 'POST':
-        # Retrieve form data
         model = joblib.load('accounts/linear_regression_model.pkl')
         height = float(request.POST['height'])
         weight = float(request.POST['weight'])
@@ -264,7 +240,6 @@ def bmi_predicted(request):
         juice_quantity = int(request.POST['juice'])
         workout = int(request.POST['workout'])
 
-        # Calculate total nutrients and calories
         total_proteins = rice_quantity * 2.6 + roti_quantity * 3 + dal_quantity * 8.9 + eggs_quantity * 6 + sabzi_quantity * 2 + fruits_quantity * 0.6 + buttermilk_quantity * 2 + juice_quantity * 0.5
         total_fats = rice_quantity * 0.3 + roti_quantity * 1 + dal_quantity * 0.4 + eggs_quantity * 5.3 + sabzi_quantity * 4 + fruits_quantity * 0.5 + buttermilk_quantity * 1.5 + juice_quantity * 0.2
         total_carbohydrates = rice_quantity * 28 + roti_quantity * 15 + dal_quantity * 20 + eggs_quantity * 1.1 + sabzi_quantity * 8 + fruits_quantity * 15 + buttermilk_quantity * 10 + juice_quantity * 25
@@ -272,7 +247,6 @@ def bmi_predicted(request):
         total_minerals = rice_quantity * 0.5 + roti_quantity * 0.3 + dal_quantity * 0.2 + eggs_quantity * 0.1 + sabzi_quantity * 1 + fruits_quantity * 0.3 + buttermilk_quantity * 0.7 + juice_quantity * 0.5
         total_calories = rice_quantity * 130 + roti_quantity * 80 + dal_quantity * 104 + eggs_quantity * 78 + sabzi_quantity * 120 + fruits_quantity * 60 + buttermilk_quantity * 42 + juice_quantity * 100
 
-        # Calculate BMI
         bmi = int(weight / ((height / 100) ** 2))
         protein_percentage = (total_proteins / 1000) * 100
         carbohydrate_percentage = (total_carbohydrates / 5000) * 100
@@ -285,17 +259,14 @@ def bmi_predicted(request):
         vitamin_percentage2 = (total_vitamins / total_nutrients) * 100
         mineral_percentage2 = (total_minerals / total_nutrients) * 100
 
-        # Load dataset
         dataset = pd.read_csv('accounts/dataset_2nd_april.csv')
         X = dataset.drop('BMI After 30 Days', axis=1)
         y = dataset['BMI After 30 Days']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # Train and save model
         model = train_model(X_train, y_train)
         joblib.dump(model, 'accounts/linear_regression_model.pkl')
 
-        # Make predictions
         predicted_bmi = model.predict([[bmi, total_calories, workout]])
 
         # Save BMI history record if user is authenticated
@@ -305,6 +276,44 @@ def bmi_predicted(request):
                 bmi_value=bmi,
                 predicted_bmi=predicted_bmi[0]
             )
+
+        # ---- EXPLAINABLE AI ----
+        reasons = []
+        positive_factors = []
+
+        if bmi > 25 and total_calories > 2000:
+            reasons.append("High calorie intake")
+        if bmi > 25 and workout < 3:
+            reasons.append("Low workout frequency")
+        if bmi < 18.5 and total_proteins < 50:
+            reasons.append("Low protein intake")
+        if bmi < 18.5 and total_calories < 1500:
+            reasons.append("Insufficient calorie intake")
+        if total_fats > 50:
+            reasons.append("High fat consumption")
+        if total_carbohydrates > 300:
+            reasons.append("Excessive carbohydrate intake")
+        if bmi > 25 and total_fats > 40:
+            reasons.append("High fat diet contributing to weight gain")
+        if workout == 0:
+            reasons.append("No physical activity detected")
+
+        if workout > 4:
+            positive_factors.append("Good workout frequency")
+        if total_proteins > 60:
+            positive_factors.append("Good protein intake")
+        if 18.5 <= bmi <= 25:
+            positive_factors.append("BMI in healthy range")
+        if total_calories <= 2000:
+            positive_factors.append("Controlled calorie intake")
+        if total_fats <= 30:
+            positive_factors.append("Low fat consumption")
+
+        if not reasons:
+            reasons.append("No major concerning factors detected")
+        if not positive_factors:
+            positive_factors.append("Keep improving your diet and exercise routine")
+        # ---- END EXPLAINABLE AI ----
 
         return render(request, 'accounts/bmi_predicted.html', {
             'bmi': bmi,
@@ -324,10 +333,14 @@ def bmi_predicted(request):
             'mineral_percentage2': mineral_percentage2,
             'workout': workout,
             'predicted_bmi': predicted_bmi[0],
+            'reasons': reasons,
+            'positive_factors': positive_factors,
         })
 
 
 def bmi_history(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     bmi_records = BMIHistory.objects.filter(
         user=request.user).order_by('-recorded_at')[:10]
     return render(request, 'accounts/bmi_history.html', {'bmi_history': bmi_records})
