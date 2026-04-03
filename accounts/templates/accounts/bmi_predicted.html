@@ -4,248 +4,280 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>BMI Analysis Dashboard</title>
+    <title>BMI Analysis — Fight Famishment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * { font-family: 'Inter', sans-serif; }
-        body { background: #0f0f1a; color: #e0e0e0; }
+        body { background: #f8f8f8; color: #1a1a1a; }
 
-        .hero-header {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            padding: 40px 0 20px;
-            border-bottom: 1px solid #1e3a5f;
+        /* HEADER */
+        .page-header {
+            background: #fff;
+            border-bottom: 3px solid #ff5733;
+            padding: 20px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
-
-        .hero-header h1 {
-            font-size: 2.2rem;
+        .page-header h1 {
+            font-size: 1.8rem;
             font-weight: 800;
-            background: linear-gradient(90deg, #4fc3f7, #7c4dff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ff5733;
+            margin: 0;
+        }
+        .page-header p {
+            color: #888;
+            margin: 0;
+            font-size: 0.9rem;
         }
 
         /* METRIC CARDS */
         .metric-card {
-            background: linear-gradient(145deg, #1e1e35, #252540);
+            background: #fff;
             border-radius: 16px;
-            padding: 24px;
-            border: 1px solid rgba(255,255,255,0.07);
-            transition: transform 0.2s;
+            padding: 22px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .metric-card:hover { transform: translateY(-4px); }
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
         .metric-card .value {
             font-size: 2rem;
             font-weight: 800;
+            line-height: 1;
         }
         .metric-card .label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            opacity: 0.6;
-            margin-top: 4px;
+            color: #aaa;
+            margin-top: 6px;
         }
         .metric-card .progress {
-            height: 6px;
+            height: 5px;
             border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            margin-top: 12px;
+            background: #f0f0f0;
+            margin-top: 14px;
         }
 
-        /* BMI STATUS CARD */
-        .bmi-status-card {
-            background: linear-gradient(145deg, #1e1e35, #252540);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255,255,255,0.07);
+        /* STATUS CARDS */
+        .info-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            height: 100%;
         }
-
-        /* CHART CARDS */
-        .chart-card {
-            background: linear-gradient(145deg, #1e1e35, #252540);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid rgba(255,255,255,0.07);
-        }
-
-        /* EXPLAINABLE AI SECTION */
-        .xai-card {
-            background: linear-gradient(145deg, #1a1a2e, #1e2a45);
-            border-radius: 20px;
-            border: 1px solid rgba(79, 195, 247, 0.2);
-            overflow: hidden;
-        }
-        .xai-header {
-            background: linear-gradient(90deg, #0f3460, #1a1a2e);
-            padding: 24px 30px;
-            border-bottom: 1px solid rgba(79, 195, 247, 0.15);
-        }
-        .xai-header h3 {
-            font-weight: 800;
-            font-size: 1.4rem;
-            color: #4fc3f7;
-            margin: 0;
-        }
-        .xai-body { padding: 30px; }
-
-        .factor-item {
-            background: rgba(255,255,255,0.04);
-            border-radius: 12px;
-            padding: 16px 20px;
+        .section-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff5733;
+            font-weight: 700;
             margin-bottom: 12px;
-            border-left: 4px solid;
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-        }
-        .factor-item.danger { border-left-color: #ef5350; }
-        .factor-item.success { border-left-color: #66bb6a; }
-        .factor-item.warning { border-left-color: #ffa726; }
-
-        .factor-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        .factor-icon.danger { background: rgba(239,83,80,0.15); color: #ef5350; }
-        .factor-icon.success { background: rgba(102,187,106,0.15); color: #66bb6a; }
-        .factor-icon.warning { background: rgba(255,167,38,0.15); color: #ffa726; }
-
-        .factor-content .title {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #e0e0e0;
-        }
-        .factor-content .desc {
-            font-size: 0.82rem;
-            color: #9e9e9e;
-            margin-top: 3px;
-            line-height: 1.5;
-        }
-
-        /* SCORE METER */
-        .health-score {
-            background: linear-gradient(145deg, #1e1e35, #252540);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255,255,255,0.07);
-            text-align: center;
-        }
-        .score-circle {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 800;
-            position: relative;
         }
 
         /* BMI SCALE */
-        .bmi-scale {
-            background: linear-gradient(145deg, #1e1e35, #252540);
-            border-radius: 20px;
-            padding: 24px 30px;
-            border: 1px solid rgba(255,255,255,0.07);
+        .bmi-scale-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 32px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
         }
-        .scale-bar {
-            height: 16px;
-            border-radius: 8px;
-            background: linear-gradient(90deg, #4fc3f7 0%, #66bb6a 30%, #ffa726 60%, #ef5350 100%);
+        .scale-track {
+            height: 14px;
+            border-radius: 7px;
+            background: linear-gradient(90deg, #64b5f6 0%, #81c784 30%, #ffb74d 60%, #e57373 100%);
             position: relative;
-            margin: 20px 0 30px;
+            margin: 20px 0 32px;
         }
         .scale-pointer {
             position: absolute;
-            top: -8px;
+            top: -10px;
             transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 8px solid transparent;
             border-right: 8px solid transparent;
-            border-top: 16px solid white;
+            border-top: 14px solid #1a1a1a;
         }
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
-            color: #9e9e9e;
-            margin-top: -20px;
+            margin-top: -22px;
+        }
+        .scale-labels span {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* CHART CARD */
+        .chart-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+
+        /* XAI SECTION */
+        .xai-wrapper {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .xai-top {
+            background: linear-gradient(135deg, #ff5733 0%, #ff8a65 100%);
+            padding: 28px 32px;
+        }
+        .xai-top h3 {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin: 0;
+        }
+        .xai-top p {
+            color: rgba(255,255,255,0.85);
+            margin: 6px 0 0;
+            font-size: 0.88rem;
+        }
+        .xai-body { padding: 32px; }
+
+        /* FACTOR ITEMS */
+        .factor-item {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: background 0.2s;
+        }
+        .factor-item:hover { background: #f5f5f5; }
+        .factor-item.danger { border-left-color: #ef5350; }
+        .factor-item.success { border-left-color: #66bb6a; }
+        .factor-item.warning { border-left-color: #ffa726; }
+
+        .factor-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .factor-icon.danger { background: #ffebee; color: #ef5350; }
+        .factor-icon.success { background: #e8f5e9; color: #43a047; }
+        .factor-icon.warning { background: #fff3e0; color: #ffa726; }
+
+        .factor-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: #1a1a1a;
+        }
+        .factor-desc {
+            font-size: 0.82rem;
+            color: #666;
+            margin-top: 3px;
+            line-height: 1.6;
         }
 
         /* RECOMMENDATION PILLS */
+        .rec-section {
+            background: #fafafa;
+            border-radius: 14px;
+            padding: 22px 24px;
+            border: 1px solid #f0f0f0;
+        }
         .rec-pill {
-            display: inline-block;
-            padding: 8px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
             border-radius: 50px;
             font-size: 0.82rem;
             font-weight: 600;
             margin: 4px;
+            background: #fff0ed;
+            color: #ff5733;
+            border: 1px solid #ffd5cc;
         }
+
+        /* STATUS BADGES */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .status-underweight { background: #e3f2fd; color: #1976d2; }
+        .status-healthy { background: #e8f5e9; color: #2e7d32; }
+        .status-overweight { background: #ffebee; color: #c62828; }
 
         /* BUTTONS */
-        .btn-glow {
-            background: linear-gradient(135deg, #4fc3f7, #7c4dff);
+        .btn-primary-ff {
+            background: #ff5733;
             border: none;
             border-radius: 50px;
-            padding: 12px 28px;
-            font-weight: 600;
+            padding: 11px 28px;
+            font-weight: 700;
             color: white;
-            transition: all 0.3s;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
-        .btn-glow:hover {
+        .btn-primary-ff:hover {
+            background: #e64a2e;
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 195, 247, 0.4);
-            color: white;
+            box-shadow: 0 6px 20px rgba(255,87,51,0.3);
         }
-        .btn-outline-glow {
+        .btn-outline-ff {
             background: transparent;
-            border: 2px solid #4fc3f7;
+            border: 2px solid #ff5733;
             border-radius: 50px;
-            padding: 10px 26px;
-            font-weight: 600;
-            color: #4fc3f7;
-            transition: all 0.3s;
+            padding: 9px 26px;
+            font-weight: 700;
+            color: #ff5733;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
-        .btn-outline-glow:hover {
-            background: #4fc3f7;
-            color: #0f0f1a;
+        .btn-outline-ff:hover {
+            background: #ff5733;
+            color: white;
         }
 
-        .section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #4fc3f7;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
+        hr.styled { border-color: #f0f0f0; margin: 24px 0; }
     </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="hero-header">
+<!-- PAGE HEADER -->
+<div class="page-header">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1><i class="fas fa-heartbeat me-2"></i>BMI Analysis Report</h1>
-                <p style="color:#9e9e9e; margin:0;">Personalized health insights powered by AI</p>
+            <div class="col-md-7">
+                <h1><i class="fas fa-heartbeat me-2"></i>Your BMI Analysis Report</h1>
+                <p>Personalized health insights based on your nutrition and activity data</p>
             </div>
-            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <a href="/bmi-history" class="btn btn-outline-glow me-2">
+            <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end flex-wrap">
+                <a href="/bmi-history" class="btn btn-outline-ff">
                     <i class="fas fa-history me-1"></i> BMI History
                 </a>
-                <a href="/child_bmi" class="btn btn-glow">
+                <a href="/child_bmi" class="btn btn-primary-ff">
                     <i class="fas fa-utensils me-1"></i> See Recipes
                 </a>
             </div>
@@ -255,232 +287,243 @@
 
 <div class="container py-4">
 
-    <!-- TOP METRIC CARDS -->
+    <!-- METRIC CARDS -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="metric-card">
-                <div class="value text-danger">{{ total_proteins|floatformat:1 }}g</div>
+                <div class="value" style="color:#ef5350;">{{ total_proteins|floatformat:1 }}g</div>
                 <div class="label">Protein</div>
-                <div class="progress mt-2">
-                    <div class="progress-bar bg-danger" style="width:{{ protein_percentage }}%"></div>
+                <div class="progress">
+                    <div class="progress-bar" style="width:{{ protein_percentage }}%; background:#ef5350;"></div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="metric-card">
-                <div class="value text-success">{{ total_carbohydrates|floatformat:1 }}g</div>
+                <div class="value" style="color:#43a047;">{{ total_carbohydrates|floatformat:1 }}g</div>
                 <div class="label">Carbohydrates</div>
-                <div class="progress mt-2">
-                    <div class="progress-bar bg-success" style="width:{{ carbohydrate_percentage }}%"></div>
+                <div class="progress">
+                    <div class="progress-bar" style="width:{{ carbohydrate_percentage }}%; background:#43a047;"></div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="metric-card">
-                <div class="value text-warning">{{ total_fats|floatformat:1 }}g</div>
+                <div class="value" style="color:#ffa726;">{{ total_fats|floatformat:1 }}g</div>
                 <div class="label">Fats</div>
-                <div class="progress mt-2">
-                    <div class="progress-bar bg-warning" style="width:{{ fat_percentage }}%"></div>
+                <div class="progress">
+                    <div class="progress-bar" style="width:{{ fat_percentage }}%; background:#ffa726;"></div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="metric-card">
-                <div class="value text-info">{{ bmi }}</div>
+                <div class="value" style="color:#ff5733;">{{ bmi }}</div>
                 <div class="label">Current BMI</div>
-                <div class="progress mt-2">
-                    <div class="progress-bar bg-info" style="width:{{ bmi }}%"></div>
+                <div class="progress">
+                    <div class="progress-bar" style="width:{{ bmi }}%; background:#ff5733;"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- BMI STATUS + PREDICTED BMI -->
+    <!-- BMI STATUS + PREDICTION -->
     <div class="row g-3 mb-4">
         <div class="col-md-6">
-            <div class="bmi-status-card h-100">
-                <div class="section-title">BMI Status</div>
-                <h2 style="font-size:3rem; font-weight:800; color:#4fc3f7;">{{ bmi }}</h2>
+            <div class="info-card">
+                <div class="section-label">Your BMI Status</div>
+                <div style="font-size:3.5rem; font-weight:800; color:#ff5733; line-height:1;">{{ bmi }}</div>
+                <div class="mt-2 mb-3">
+                    {% if bmi < 18.5 %}
+                        <span class="status-badge status-underweight">
+                            <i class="fas fa-arrow-down me-1"></i> Underweight
+                        </span>
+                    {% elif bmi > 25.5 %}
+                        <span class="status-badge status-overweight">
+                            <i class="fas fa-arrow-up me-1"></i> Overweight
+                        </span>
+                    {% else %}
+                        <span class="status-badge status-healthy">
+                            <i class="fas fa-check me-1"></i> Healthy
+                        </span>
+                    {% endif %}
+                </div>
                 {% if bmi < 18.5 %}
-                    <span style="background:rgba(79,195,247,0.15); color:#4fc3f7; padding:6px 16px; border-radius:50px; font-weight:600; font-size:0.9rem;">
-                        <i class="fas fa-arrow-down me-1"></i> Underweight
-                    </span>
-                    <p style="color:#9e9e9e; margin-top:16px; line-height:1.7;">
-                        Your BMI of <strong style="color:#4fc3f7;">{{ bmi }}</strong> is below the healthy range of 18.5–25.
+                    <p style="color:#555; line-height:1.8; font-size:0.9rem;">
+                        Your BMI of <strong style="color:#ff5733;">{{ bmi }}</strong> is below the healthy range of 18.5–25.
                         Being underweight increases risk of nutrient deficiencies, weakened immunity, and bone density loss.
                         Focus on calorie-dense, nutritious foods.
                     </p>
                 {% elif bmi > 25.5 %}
-                    <span style="background:rgba(239,83,80,0.15); color:#ef5350; padding:6px 16px; border-radius:50px; font-weight:600; font-size:0.9rem;">
-                        <i class="fas fa-arrow-up me-1"></i> Overweight
-                    </span>
-                    <p style="color:#9e9e9e; margin-top:16px; line-height:1.7;">
-                        Your BMI of <strong style="color:#ef5350;">{{ bmi }}</strong> is above the healthy range of 18.5–25.
+                    <p style="color:#555; line-height:1.8; font-size:0.9rem;">
+                        Your BMI of <strong style="color:#ff5733;">{{ bmi }}</strong> is above the healthy range of 18.5–25.
                         Being overweight increases risk of Type 2 diabetes, hypertension, and cardiovascular disease.
                         Focus on reducing calorie intake and increasing physical activity.
                     </p>
                 {% else %}
-                    <span style="background:rgba(102,187,106,0.15); color:#66bb6a; padding:6px 16px; border-radius:50px; font-weight:600; font-size:0.9rem;">
-                        <i class="fas fa-check me-1"></i> Healthy
-                    </span>
-                    <p style="color:#9e9e9e; margin-top:16px; line-height:1.7;">
-                        Your BMI of <strong style="color:#66bb6a;">{{ bmi }}</strong> is within the healthy range of 18.5–25.
+                    <p style="color:#555; line-height:1.8; font-size:0.9rem;">
+                        Your BMI of <strong style="color:#43a047;">{{ bmi }}</strong> is within the ideal range of 18.5–25.
                         Maintain your current diet and exercise habits to stay in this range.
                     </p>
                 {% endif %}
             </div>
         </div>
         <div class="col-md-6">
-            <div class="bmi-status-card h-100">
-                <div class="section-title">30-Day Prediction</div>
-                <h2 style="font-size:3rem; font-weight:800; color:#7c4dff;">{{ predicted_bmi|floatformat:2 }}</h2>
-                <span style="background:rgba(124,77,255,0.15); color:#7c4dff; padding:6px 16px; border-radius:50px; font-weight:600; font-size:0.9rem;">
-                    <i class="fas fa-brain me-1"></i> ML Predicted BMI
-                </span>
-                <p style="color:#9e9e9e; margin-top:16px; line-height:1.7;">
-                    Based on your current calorie intake of <strong style="color:#ffa726;">{{ total_calories|floatformat:0 }} kcal</strong>
+            <div class="info-card">
+                <div class="section-label">30-Day ML Prediction</div>
+                <div style="font-size:3.5rem; font-weight:800; color:#7c4dff; line-height:1;">{{ predicted_bmi|floatformat:2 }}</div>
+                <div class="mt-2 mb-3">
+                    <span class="status-badge" style="background:#f3e5f5; color:#7c4dff;">
+                        <i class="fas fa-brain me-1"></i> Predicted BMI
+                    </span>
+                </div>
+                <p style="color:#555; line-height:1.8; font-size:0.9rem;">
+                    Based on your current calorie intake of
+                    <strong style="color:#ffa726;">{{ total_calories|floatformat:0 }} kcal</strong>
                     and <strong style="color:#ffa726;">{{ workout }} workout sessions</strong>,
-                    our Linear Regression model predicts your BMI will be
-                    <strong style="color:#7c4dff;">{{ predicted_bmi|floatformat:2 }}</strong> after 30 days.
+                    our Linear Regression model predicts your BMI will reach
+                    <strong style="color:#7c4dff;">{{ predicted_bmi|floatformat:2 }}</strong> after 30 days
+                    if you maintain the same habits.
                 </p>
             </div>
         </div>
     </div>
 
     <!-- BMI SCALE -->
-    <div class="bmi-scale mb-4">
-        <div class="section-title">BMI Scale — Where You Stand</div>
-        <div class="scale-bar">
+    <div class="bmi-scale-card mb-4">
+        <div class="section-label">BMI Scale — Where You Stand</div>
+        <div class="scale-track">
             {% if bmi < 15 %}
-                <div class="scale-pointer" style="left: 2%;"></div>
+                <div class="scale-pointer" style="left:2%;"></div>
             {% elif bmi < 18.5 %}
-                <div class="scale-pointer" style="left: {{ bmi|floatformat:0 }}%;"></div>
+                <div class="scale-pointer" style="left:15%;"></div>
+            {% elif bmi < 22 %}
+                <div class="scale-pointer" style="left:38%;"></div>
             {% elif bmi < 25 %}
-                <div class="scale-pointer" style="left: 40%;"></div>
+                <div class="scale-pointer" style="left:52%;"></div>
             {% elif bmi < 30 %}
-                <div class="scale-pointer" style="left: 65%;"></div>
+                <div class="scale-pointer" style="left:68%;"></div>
             {% else %}
-                <div class="scale-pointer" style="left: 88%;"></div>
+                <div class="scale-pointer" style="left:88%;"></div>
             {% endif %}
         </div>
         <div class="scale-labels">
-            <span style="color:#4fc3f7;">Underweight<br><small>&lt; 18.5</small></span>
-            <span style="color:#66bb6a;">Normal<br><small>18.5 – 24.9</small></span>
-            <span style="color:#ffa726;">Overweight<br><small>25 – 29.9</small></span>
-            <span style="color:#ef5350;">Obese<br><small>&gt; 30</small></span>
+            <span style="color:#1976d2;">Underweight<br><small style="font-weight:400;">&lt; 18.5</small></span>
+            <span style="color:#2e7d32;">Normal<br><small style="font-weight:400;">18.5–24.9</small></span>
+            <span style="color:#e65100;">Overweight<br><small style="font-weight:400;">25–29.9</small></span>
+            <span style="color:#c62828;">Obese<br><small style="font-weight:400;">&gt; 30</small></span>
         </div>
     </div>
 
-    <!-- CHARTS ROW -->
+    <!-- CHARTS -->
     <div class="row g-3 mb-4">
         <div class="col-md-5">
-            <div class="chart-card h-100">
-                <div class="section-title">Nutrient Distribution</div>
-                <div id="pie_chart" style="width:100%; height:300px;"></div>
+            <div class="chart-card">
+                <div class="section-label">Nutrient Distribution</div>
+                <div id="pie_chart" style="width:100%; height:280px;"></div>
             </div>
         </div>
         <div class="col-md-7">
-            <div class="chart-card h-100">
-                <div class="section-title">30-Day BMI Projection</div>
-                <canvas id="line-chart" style="height:300px;"></canvas>
+            <div class="chart-card">
+                <div class="section-label">30-Day BMI Projection</div>
+                <canvas id="line-chart" style="max-height:280px;"></canvas>
             </div>
         </div>
     </div>
 
     <!-- EXPLAINABLE AI SECTION -->
-    <div class="xai-card mb-4">
-        <div class="xai-header">
+    <div class="xai-wrapper mb-4">
+        <div class="xai-top">
             <div class="d-flex align-items-center gap-3">
-                <div style="background:rgba(79,195,247,0.15); width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px;">
+                <div style="background:rgba(255,255,255,0.2); width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">
                     🔍
                 </div>
                 <div>
                     <h3>Why is your BMI like this?</h3>
-                    <p style="color:#9e9e9e; margin:0; font-size:0.85rem;">
-                        AI-powered analysis of your health inputs — explaining the exact factors driving your BMI
-                    </p>
+                    <p>Our AI analyzed your nutrition inputs to explain the exact factors driving your current BMI</p>
                 </div>
             </div>
         </div>
+
         <div class="xai-body">
             <div class="row g-4">
 
                 <!-- CONCERNING FACTORS -->
                 <div class="col-md-6">
-                    <div class="section-title" style="color:#ef5350;">
+                    <div class="section-label" style="color:#ef5350;">
                         <i class="fas fa-exclamation-triangle me-1"></i> Concerning Factors
                     </div>
                     {% for reason in reasons %}
                         {% if reason == "High calorie intake" %}
                         <div class="factor-item danger">
-                            <div class="factor-icon danger"><i class="fas fa-fire"></i></div>
-                            <div class="factor-content">
-                                <div class="title">High Calorie Intake</div>
-                                <div class="desc">Your daily calorie intake ({{ total_calories|floatformat:0 }} kcal) exceeds recommended levels. Excess calories are stored as fat, directly contributing to weight gain and higher BMI.</div>
+                            <div class="factor-icon danger"><i class="fas fa-fire-alt"></i></div>
+                            <div>
+                                <div class="factor-title">High Calorie Intake</div>
+                                <div class="factor-desc">Your daily intake of <strong>{{ total_calories|floatformat:0 }} kcal</strong> exceeds recommended levels. Excess calories are stored as body fat, directly raising BMI over time.</div>
                             </div>
                         </div>
                         {% elif reason == "Low workout frequency" %}
                         <div class="factor-item danger">
                             <div class="factor-icon danger"><i class="fas fa-bed"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Low Physical Activity</div>
-                                <div class="desc">Only {{ workout }} workout sessions detected. Low activity means fewer calories burned, slower metabolism, and difficulty maintaining a healthy weight.</div>
+                            <div>
+                                <div class="factor-title">Low Physical Activity</div>
+                                <div class="factor-desc">Only <strong>{{ workout }} workout sessions</strong> detected. Low activity reduces calorie burn, slows metabolism, and makes it harder to maintain a healthy BMI.</div>
                             </div>
                         </div>
                         {% elif reason == "Low protein intake" %}
                         <div class="factor-item danger">
                             <div class="factor-icon danger"><i class="fas fa-drumstick-bite"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Insufficient Protein</div>
-                                <div class="desc">Protein intake ({{ total_proteins|floatformat:1 }}g) is below optimal levels. Low protein leads to muscle loss, weakened immunity, and difficulty maintaining healthy body weight.</div>
+                            <div>
+                                <div class="factor-title">Insufficient Protein</div>
+                                <div class="factor-desc">Protein intake of <strong>{{ total_proteins|floatformat:1 }}g</strong> is below optimal. Low protein causes muscle loss, weakened immunity, and difficulty maintaining healthy body weight.</div>
                             </div>
                         </div>
                         {% elif reason == "Insufficient calorie intake" %}
                         <div class="factor-item danger">
                             <div class="factor-icon danger"><i class="fas fa-battery-quarter"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Insufficient Calorie Intake</div>
-                                <div class="desc">Your intake ({{ total_calories|floatformat:0 }} kcal) is too low for healthy body function. Caloric deficit causes the body to break down muscle tissue for energy, worsening underweight condition.</div>
+                            <div>
+                                <div class="factor-title">Insufficient Calorie Intake</div>
+                                <div class="factor-desc">Only <strong>{{ total_calories|floatformat:0 }} kcal</strong> consumed — too low for healthy body function. Caloric deficit causes muscle breakdown, worsening underweight condition.</div>
                             </div>
                         </div>
                         {% elif reason == "High fat consumption" %}
                         <div class="factor-item danger">
                             <div class="factor-icon danger"><i class="fas fa-oil-can"></i></div>
-                            <div class="factor-content">
-                                <div class="title">High Fat Consumption</div>
-                                <div class="desc">Fat intake ({{ total_fats|floatformat:1 }}g) is elevated. Dietary fat has 9 calories per gram — more than double protein or carbs — making it the biggest contributor to caloric surplus.</div>
+                            <div>
+                                <div class="factor-title">High Fat Consumption</div>
+                                <div class="factor-desc">Fat intake of <strong>{{ total_fats|floatformat:1 }}g</strong> is elevated. Fat has 9 cal/g — more than double protein or carbs — making it the biggest driver of caloric surplus.</div>
                             </div>
                         </div>
                         {% elif reason == "Excessive carbohydrate intake" %}
                         <div class="factor-item danger">
                             <div class="factor-icon danger"><i class="fas fa-bread-slice"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Excessive Carbohydrate Intake</div>
-                                <div class="desc">Carbohydrate intake ({{ total_carbohydrates|floatformat:1 }}g) is very high. Excess carbs spike blood sugar and insulin, promoting fat storage especially around the abdomen.</div>
+                            <div>
+                                <div class="factor-title">Excessive Carbohydrate Intake</div>
+                                <div class="factor-desc">Carbohydrate intake of <strong>{{ total_carbohydrates|floatformat:1 }}g</strong> is very high. Excess carbs spike blood sugar and insulin, promoting fat storage especially around the abdomen.</div>
                             </div>
                         </div>
                         {% elif reason == "High fat diet contributing to weight gain" %}
                         <div class="factor-item danger">
                             <div class="factor-icon danger"><i class="fas fa-weight"></i></div>
-                            <div class="factor-content">
-                                <div class="title">High Fat Diet + Overweight</div>
-                                <div class="desc">Combination of high fat intake and elevated BMI is a risk factor for metabolic syndrome, Type 2 diabetes, and cardiovascular disease.</div>
+                            <div>
+                                <div class="factor-title">High Fat + Elevated BMI</div>
+                                <div class="factor-desc">Combination of high fat intake and elevated BMI is a key risk factor for metabolic syndrome, Type 2 diabetes, and cardiovascular disease.</div>
                             </div>
                         </div>
                         {% elif reason == "No physical activity detected" %}
                         <div class="factor-item danger">
                             <div class="factor-icon danger"><i class="fas fa-couch"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Completely Sedentary Lifestyle</div>
-                                <div class="desc">Zero workout sessions recorded. A sedentary lifestyle is independently associated with increased risk of obesity, heart disease, and metabolic disorders regardless of diet.</div>
+                            <div>
+                                <div class="factor-title">Completely Sedentary</div>
+                                <div class="factor-desc">Zero workout sessions recorded. A sedentary lifestyle independently increases risk of obesity, heart disease, and metabolic disorders regardless of diet.</div>
                             </div>
                         </div>
                         {% else %}
                         <div class="factor-item warning">
                             <div class="factor-icon warning"><i class="fas fa-info-circle"></i></div>
-                            <div class="factor-content">
-                                <div class="title">{{ reason }}</div>
-                                <div class="desc">Monitor this factor and consult a nutritionist for personalized guidance.</div>
+                            <div>
+                                <div class="factor-title">{{ reason }}</div>
+                                <div class="factor-desc">Monitor this factor and consult a nutritionist for personalized guidance.</div>
                             </div>
                         </div>
                         {% endif %}
@@ -489,56 +532,56 @@
 
                 <!-- POSITIVE FACTORS -->
                 <div class="col-md-6">
-                    <div class="section-title" style="color:#66bb6a;">
+                    <div class="section-label" style="color:#43a047;">
                         <i class="fas fa-check-circle me-1"></i> Positive Factors
                     </div>
                     {% for factor in positive_factors %}
                         {% if factor == "Good workout frequency" %}
                         <div class="factor-item success">
                             <div class="factor-icon success"><i class="fas fa-dumbbell"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Active Lifestyle</div>
-                                <div class="desc">{{ workout }} workout sessions is excellent. Regular exercise boosts metabolism, preserves muscle mass, improves insulin sensitivity, and directly supports healthy BMI maintenance.</div>
+                            <div>
+                                <div class="factor-title">Active Lifestyle</div>
+                                <div class="factor-desc"><strong>{{ workout }} workout sessions</strong> is excellent. Regular exercise boosts metabolism, preserves muscle, improves insulin sensitivity, and directly supports healthy BMI.</div>
                             </div>
                         </div>
                         {% elif factor == "Good protein intake" %}
                         <div class="factor-item success">
                             <div class="factor-icon success"><i class="fas fa-egg"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Strong Protein Intake</div>
-                                <div class="desc">{{ total_proteins|floatformat:1 }}g of protein is well within healthy range. High protein diets increase satiety, preserve lean muscle, and have a higher thermic effect — burning more calories during digestion.</div>
+                            <div>
+                                <div class="factor-title">Strong Protein Intake</div>
+                                <div class="factor-desc"><strong>{{ total_proteins|floatformat:1 }}g</strong> of protein is well within healthy range. High protein increases satiety, preserves muscle, and burns more calories during digestion.</div>
                             </div>
                         </div>
                         {% elif factor == "BMI in healthy range" %}
                         <div class="factor-item success">
                             <div class="factor-icon success"><i class="fas fa-heart"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Healthy BMI Range</div>
-                                <div class="desc">BMI of {{ bmi }} falls within the ideal 18.5–25 range. This is associated with the lowest risk of chronic disease, better energy levels, and improved longevity.</div>
+                            <div>
+                                <div class="factor-title">Healthy BMI Range</div>
+                                <div class="factor-desc">BMI of <strong>{{ bmi }}</strong> falls within the ideal 18.5–25 range — associated with the lowest risk of chronic disease and better longevity.</div>
                             </div>
                         </div>
                         {% elif factor == "Controlled calorie intake" %}
                         <div class="factor-item success">
                             <div class="factor-icon success"><i class="fas fa-balance-scale"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Controlled Calorie Intake</div>
-                                <div class="desc">{{ total_calories|floatformat:0 }} kcal is within a healthy range. Controlled calorie intake prevents excess fat storage while providing sufficient energy for daily activities.</div>
+                            <div>
+                                <div class="factor-title">Controlled Calorie Intake</div>
+                                <div class="factor-desc"><strong>{{ total_calories|floatformat:0 }} kcal</strong> is within a healthy range. Controlled intake prevents excess fat storage while providing sufficient energy for daily activities.</div>
                             </div>
                         </div>
                         {% elif factor == "Low fat consumption" %}
                         <div class="factor-item success">
                             <div class="factor-icon success"><i class="fas fa-leaf"></i></div>
-                            <div class="factor-content">
-                                <div class="title">Low Fat Diet</div>
-                                <div class="desc">Fat intake ({{ total_fats|floatformat:1 }}g) is well controlled. A low fat diet reduces cardiovascular risk, supports healthy cholesterol levels, and prevents excess caloric surplus.</div>
+                            <div>
+                                <div class="factor-title">Low Fat Diet</div>
+                                <div class="factor-desc">Fat intake of <strong>{{ total_fats|floatformat:1 }}g</strong> is well controlled. Low fat diet reduces cardiovascular risk and prevents caloric surplus.</div>
                             </div>
                         </div>
                         {% else %}
                         <div class="factor-item success">
                             <div class="factor-icon success"><i class="fas fa-thumbs-up"></i></div>
-                            <div class="factor-content">
-                                <div class="title">{{ factor }}</div>
-                                <div class="desc">Keep maintaining this healthy habit to support long-term wellness.</div>
+                            <div>
+                                <div class="factor-title">{{ factor }}</div>
+                                <div class="factor-desc">Keep maintaining this healthy habit to support long-term wellness.</div>
                             </div>
                         </div>
                         {% endif %}
@@ -548,47 +591,30 @@
             </div>
 
             <!-- RECOMMENDATIONS -->
-            <hr style="border-color: rgba(255,255,255,0.1); margin: 24px 0;">
-            <div class="section-title">
-                <i class="fas fa-lightbulb me-1"></i> AI Recommendations
+            <hr class="styled">
+            <div class="section-label">
+                <i class="fas fa-lightbulb me-1"></i> AI Recommendations For You
             </div>
-            <div>
+            <div class="rec-section">
                 {% if bmi < 18.5 %}
-                    <span class="rec-pill" style="background:rgba(79,195,247,0.15); color:#4fc3f7;">
-                        <i class="fas fa-plus me-1"></i> Increase daily calories by 300–500 kcal
-                    </span>
-                    <span class="rec-pill" style="background:rgba(79,195,247,0.15); color:#4fc3f7;">
-                        <i class="fas fa-egg me-1"></i> Add protein-rich foods — eggs, dal, paneer
-                    </span>
-                    <span class="rec-pill" style="background:rgba(79,195,247,0.15); color:#4fc3f7;">
-                        <i class="fas fa-dumbbell me-1"></i> Start strength training 3x/week
-                    </span>
-                    <span class="rec-pill" style="background:rgba(79,195,247,0.15); color:#4fc3f7;">
-                        <i class="fas fa-clock me-1"></i> Eat every 3–4 hours, never skip meals
-                    </span>
+                    <span class="rec-pill"><i class="fas fa-plus-circle"></i> Increase daily calories by 300–500 kcal</span>
+                    <span class="rec-pill"><i class="fas fa-egg"></i> Add eggs, dal, paneer for protein</span>
+                    <span class="rec-pill"><i class="fas fa-dumbbell"></i> Start strength training 3x/week</span>
+                    <span class="rec-pill"><i class="fas fa-clock"></i> Eat every 3–4 hours, never skip meals</span>
+                    <span class="rec-pill"><i class="fas fa-apple-alt"></i> Add healthy fats — nuts, avocado, ghee</span>
+                    <span class="rec-pill"><i class="fas fa-tint"></i> Drink 2.5L water daily</span>
                 {% elif bmi > 25.5 %}
-                    <span class="rec-pill" style="background:rgba(239,83,80,0.15); color:#ef5350;">
-                        <i class="fas fa-minus me-1"></i> Reduce daily calories by 300–500 kcal
-                    </span>
-                    <span class="rec-pill" style="background:rgba(239,83,80,0.15); color:#ef5350;">
-                        <i class="fas fa-running me-1"></i> 30 min cardio 5x/week minimum
-                    </span>
-                    <span class="rec-pill" style="background:rgba(239,83,80,0.15); color:#ef5350;">
-                        <i class="fas fa-bread-slice me-1"></i> Cut refined carbs and sugar
-                    </span>
-                    <span class="rec-pill" style="background:rgba(239,83,80,0.15); color:#ef5350;">
-                        <i class="fas fa-tint me-1"></i> Drink 3L water daily
-                    </span>
+                    <span class="rec-pill"><i class="fas fa-minus-circle"></i> Reduce daily calories by 300–500 kcal</span>
+                    <span class="rec-pill"><i class="fas fa-running"></i> 30 min cardio 5x/week minimum</span>
+                    <span class="rec-pill"><i class="fas fa-bread-slice"></i> Cut refined carbs and added sugar</span>
+                    <span class="rec-pill"><i class="fas fa-tint"></i> Drink 3L water daily</span>
+                    <span class="rec-pill"><i class="fas fa-moon"></i> Sleep 7–8 hours — poor sleep raises BMI</span>
+                    <span class="rec-pill"><i class="fas fa-weight"></i> Track your weight weekly</span>
                 {% else %}
-                    <span class="rec-pill" style="background:rgba(102,187,106,0.15); color:#66bb6a;">
-                        <i class="fas fa-check me-1"></i> Maintain current diet — it's working
-                    </span>
-                    <span class="rec-pill" style="background:rgba(102,187,106,0.15); color:#66bb6a;">
-                        <i class="fas fa-chart-line me-1"></i> Track BMI monthly to stay on track
-                    </span>
-                    <span class="rec-pill" style="background:rgba(102,187,106,0.15); color:#66bb6a;">
-                        <i class="fas fa-apple-alt me-1"></i> Include seasonal fruits and vegetables
-                    </span>
+                    <span class="rec-pill"><i class="fas fa-check"></i> Maintain current diet — it's working</span>
+                    <span class="rec-pill"><i class="fas fa-chart-line"></i> Track BMI monthly to stay on track</span>
+                    <span class="rec-pill"><i class="fas fa-apple-alt"></i> Include seasonal fruits and vegetables</span>
+                    <span class="rec-pill"><i class="fas fa-dumbbell"></i> Keep up your workout routine</span>
                 {% endif %}
             </div>
         </div>
@@ -597,7 +623,7 @@
 </div>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
+<script>
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawChart);
     function drawChart() {
@@ -611,13 +637,11 @@
         ]);
         var options = {
             backgroundColor: 'transparent',
-            legend: { textStyle: { color: '#9e9e9e' } },
-            titleTextStyle: { color: '#e0e0e0' },
+            legend: { textStyle: { color: '#555', fontSize: 13 } },
             chartArea: { width: '90%', height: '85%' },
-            colors: ['#ef5350', '#66bb6a', '#ffa726', '#4fc3f7', '#7c4dff']
+            colors: ['#ef5350', '#43a047', '#ffa726', '#29b6f6', '#ab47bc']
         };
-        var chart = new google.visualization.PieChart(document.getElementById('pie_chart'));
-        chart.draw(data, options);
+        new google.visualization.PieChart(document.getElementById('pie_chart')).draw(data, options);
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -627,40 +651,39 @@
     var predictedBMI = {{ predicted_bmi }};
     var interpolatedBMI = [];
     var slope = (predictedBMI - currentBMI) / 30;
-    for (var i = 0; i <= 30; i++) {
-        interpolatedBMI.push(currentBMI + slope * i);
-    }
-    var lineChart = new Chart(ctx, {
+    for (var i = 0; i <= 30; i++) interpolatedBMI.push(+(currentBMI + slope * i).toFixed(2));
+    new Chart(ctx, {
         type: 'line',
         data: {
-            labels: Array.from(Array(31).keys()).map(d => `Day ${d}`),
+            labels: Array.from({length:31}, (_, i) => `Day ${i}`),
             datasets: [{
                 label: 'Predicted BMI',
                 data: interpolatedBMI,
-                borderColor: '#7c4dff',
-                backgroundColor: 'rgba(124,77,255,0.1)',
-                borderWidth: 2,
+                borderColor: '#ff5733',
+                backgroundColor: 'rgba(255,87,51,0.08)',
+                borderWidth: 2.5,
                 fill: true,
                 tension: 0.4,
                 pointRadius: 0,
-                pointHoverRadius: 6
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: '#ff5733'
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { labels: { color: '#9e9e9e' } }
+                legend: { labels: { color: '#555', font: { size: 13 } } }
             },
             scales: {
                 x: {
-                    ticks: { color: '#9e9e9e', maxTicksLimit: 8 },
-                    grid: { color: 'rgba(255,255,255,0.05)' }
+                    ticks: { color: '#888', maxTicksLimit: 8 },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
                 },
                 y: {
-                    ticks: { color: '#9e9e9e' },
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    min: currentBMI - 2,
-                    max: predictedBMI + 2
+                    ticks: { color: '#888' },
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    min: Math.min(currentBMI, predictedBMI) - 1.5,
+                    max: Math.max(currentBMI, predictedBMI) + 1.5
                 }
             }
         }
